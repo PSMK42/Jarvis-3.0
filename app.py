@@ -13,9 +13,14 @@ st.set_page_config(
 st.title("🤖 Jarvis AI Interface (Groq)")
 st.write("Talk to Jarvis using your voice or type a message below.")
 
-# Initialize the Groq client
-# Automatically reads the GROQ_API_KEY environment variable set in Streamlit Secrets
-client = Groq()
+# Explicitly retrieve API key from Streamlit Secrets
+api_key = st.secrets.get("GROQ_API_KEY") or os.environ.get("GROQ_API_KEY")
+
+if not api_key:
+    st.error("GROQ_API_KEY is missing! Please add it to Streamlit Secrets.")
+    st.stop()
+
+client = Groq(api_key=api_key)
 
 SYSTEM_PROMPT = (
     "You are Jarvis, a highly capable, concise, and helpful AI assistant. "
@@ -44,7 +49,7 @@ voice_text = speech_to_text(
     key='speech'
 )
 
-# Text input widget (fallback if user prefers typing)
+# Text input widget
 typed_text = st.chat_input("Type your command here...")
 
 # Pick whichever input source received data
@@ -65,7 +70,7 @@ if prompt:
                 api_messages = [{"role": "system", "content": SYSTEM_PROMPT}]
                 api_messages.extend(st.session_state.messages)
 
-                # Send request to Groq API using the high-speed 8B instant model
+                # Send request to Groq API
                 chat_completion = client.chat.completions.create(
                     model="llama-3.1-8b-instant",
                     messages=api_messages,
