@@ -14,7 +14,7 @@ st.title("🤖 Jarvis AI Interface (Groq)")
 st.write("Talk to Jarvis using your voice or type a message below.")
 
 # Initialize the Groq client
-# Automatically reads the GROQ_API_KEY environment variable
+# Automatically reads the GROQ_API_KEY environment variable set in Streamlit Secrets
 client = Groq()
 
 SYSTEM_PROMPT = (
@@ -65,9 +65,9 @@ if prompt:
                 api_messages = [{"role": "system", "content": SYSTEM_PROMPT}]
                 api_messages.extend(st.session_state.messages)
 
-                # Send request to Groq API
+                # Send request to Groq API using the high-speed 8B instant model
                 chat_completion = client.chat.completions.create(
-                    model="llama-3.3-70b-versatile",
+                    model="llama-3.1-8b-instant",
                     messages=api_messages,
                     temperature=0.7,
                     max_tokens=1024,
